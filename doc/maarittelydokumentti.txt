@@ -1,0 +1,54 @@
+Määrittelydokumentti
+
+ 1 Mitä algoritmeja ja tietorakenteita toteutat työssäsi
+
+	Punamustapuu ja trie-tietorakenne sekä lisäys ja haku algoritmit näitä tietorakenteita varten.
+
+ 2 Mitä ongelmaa ratkaiset ja miksi valitsit kyseiset algoritmit/tietorakenteet
+
+	Toteutan sanaindeksiohjelman kurssimateriaalissa annetun tehtävänannon perusteella.
+
+	"Sanaindeksiohjelma saa syötteenä yhden tai useamman tekstitiedoston. Tiedostojen sanoista 
+	 muodostetaan yksi hakupuu, jolloin on helppoa hakea tietyn sanan esiintymiskohdat 
+	 tiedostoissa. Vertaile ohjelmaa kahdella eri puun totetuksella:  punamusta ja trie. 
+         Oma aputietorakenne. Parhaimpaan arvosanaan vaaditaan, että ohjelma voi lukea sisään n 
+         tiedostoa yhteen puuhun ja haun voi suorittaa m sanalla / sananalulla."
+
+ 3 Mitä syötteitä ohjelma saa ja miten näitä käytetään
+
+	Ohjelmasta tulee komentorivipohjainen. Ohjelmalle annetaan käynnistyksen yhteydessä 
+	parametrinä haluttu tietorakenne (punamusta tai trie) sekä lista tiedostoista, joihin 
+	haku kohdistuu. Tämän jälkeen ohjelma lukee stdin:sta sanoja tai sanan alkuja, jotka 
+	päättyvät new-line-merkkiin. New-line-merkin vastaanotettuaan ohjelma tulostaa haun 
+	tulokset stdout:iin. Ohjelman suoritus loppuu syötteen end-of-file ehdon toteuduttua.
+	Pelkän new-line-merkin syöttäminen ilman hakusanaa ei tuota hakua. Trie-algoritmiä
+	käytettäessä sallii ohjelma etsittävän merkkijonon loppuun katkaisumerkin, jolloin
+	haku tuottaa tulokseksi kaikki sanat jotka alkavat katkaisumerkkiä edeltävällä
+	merkkijonolla.
+
+ 4 Tavoitteena olevat aika- ja tilavaativuudet (m.m. O-analyysi)
+
+	Seuraava pätee jos oletetaan, että luettavia tiedostoja on vähemmän kuin niissä olevia
+	sanoja yhteesä. Nämä siis worst-case vaativuudet.
+
+	Alkion lisääminen trie-puuhun on aikavaativuudeltaan O(i), missä i sanan pituus. 
+	Jokaista sanan kirjainta kohden joudutaan suorittamaan vertailu. Jos oletetaan 
+	syötettävän tekstin olevan vaikka suomea on i:lle olemassa maksimi arvo, jolloin 
+	lisäämisen aikavaativuuden voidaan sanoa olevan O(1). Sama pätee trie-puusta etsimiseen.
+	Kun lisätään k sanaa on aikavaativuus siis O(k). Kun sanoja on k kappaletta 
+	ja niiden joukosta etsitään m:aa sanaa on kokonaisaikavaativuus O(k + m).
+
+	Punamustapuuhun lisäämiseen kuluva aika riippuu puun korkeudesta sekä tässä tapauksessa
+	sanojen pituudesta. Jos puussa on j sanaa on aikavaativuus O(log(j) * i) tai jos sanalle 
+	on olemassa maksimi pituus O(log(j) * 1) eli O(log(j)). Kun lisätään k sanaa on
+	aikavaativuus O(k log(k)). Haun aikavaativuus on O(m log(k)). Kun sanoja on 
+	yhteensä k kappaletta ja etsitään m sanaa on konaisaikavaativuus 
+	O( ( k log(k) ) + ( m log(k) ) ) eli O( max{k, m} log(k) ).
+
+	Tilavaativuus on O(i * n) riippumatta tallennetaanko trie- tai punamustapuuhun.
+	
+ 5 Lähteet
+
+	1. Kurssi sivu - http://www.cs.helsinki.fi/node/75614 - 2.11.2012
+	2. Wikipedia/Trie - http://en.wikipedia.org/wiki/Trie - 2.11.2012
+	3. Wikipedia/Redblack tree - http://en.wikipedia.org/wiki/Red%E2%80%93black_tree - 2.11.2012
