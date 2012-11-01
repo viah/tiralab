@@ -2,7 +2,7 @@ Määrittelydokumentti
 
  1 Mitä algoritmeja ja tietorakenteita toteutat työssäsi
 
-	Punamustapuu ja trie-tietorakenne sekä lisäys ja haku algoritmit näitä tietorakenteita varten.
+	Punamusta- ja trie-puut sekä lisäys ja haku algoritmit edellisiä varten.
 
  2 Mitä ongelmaa ratkaiset ja miksi valitsit kyseiset algoritmit/tietorakenteet
 
