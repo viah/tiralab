@@ -23,6 +23,9 @@ main(int argc, char **argv)
 	int aflag;	/* algorithm selection switch -a used */
 	char *aarg;	/* name of the selected algorithm */
 
+	int filenumber; /* used later when reading in files */
+	char *filepath; /* used later when reading in files */
+
 	aflag = 0;
 	progname = basename(argv[0]);
 
@@ -47,23 +50,26 @@ main(int argc, char **argv)
 	{
 
 		/* xxx todo: set search and insert function pointers to
-		   search_redblack and insert_redblack */
+		   search_redblack and insert_redblack and initialize
+		   the selected datastructure */
 
 		printf("redblack selected\n");
 	
 	} else if ( MATCH( aarg, "trie" ) ) {
 	
 		/* xxx todo: set search and insert function pointers to
-		   search_trie and insert_trie */
+		   search_trie and insert_trie and initialize the selected 
+		   datastructure */
 
 		printf("trie selected\n");
 
 	} else {
+
 		printf("illegal algorithm selection");
 		usage();
-
 	}
 
-	printf("%i\n", argc);
+	/* read the files to the selected data structure */
+
 
 }
