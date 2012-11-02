@@ -6,6 +6,16 @@
 
 char const *progname;
 
+/* every match will be stored in the selected data structure as liked list
+   entry of type sturct match: */
+
+struct match {
+	char *filename;
+	unsigned int line;
+	unsigned int coumn;
+	struct match *next;
+};
+
 void
 usage()
 {
@@ -18,13 +28,10 @@ usage()
 int
 main(int argc, char **argv)
 {
-	int c;
+	int c, i;
 
 	int aflag;	/* algorithm selection switch -a used */
 	char *aarg;	/* name of the selected algorithm */
-
-	int filenumber; /* used later when reading in files */
-	char *filepath; /* used later when reading in files */
 
 	aflag = 0;
 	progname = basename(argv[0]);
@@ -71,5 +78,11 @@ main(int argc, char **argv)
 
 	/* read the files to the selected data structure */
 
+	for( i = 3 ; i < argc ; i++ )
+	{
+		printf("%i: %s\n", i, argv[i]);
 
+		/* should we check for dublicate files? */
+		
+	}
 }
