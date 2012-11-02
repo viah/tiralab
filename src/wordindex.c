@@ -56,9 +56,14 @@ main(int argc, char **argv)
 	if( MATCH( aarg, "redblack" ) )
 	{
 
+
 		/* xxx todo: set search and insert function pointers to
 		   search_redblack and insert_redblack and initialize
 		   the selected datastructure */
+
+		/* redblack_initialize(); */
+		/* search = &redblack_search(); */
+		/* insert = &redblack_insert(); */
 
 		printf("redblack selected\n");
 	
@@ -67,6 +72,10 @@ main(int argc, char **argv)
 		/* xxx todo: set search and insert function pointers to
 		   search_trie and insert_trie and initialize the selected 
 		   datastructure */
+
+		/* trie_initialize(); */
+		/* search = &trie_search(); */
+		/* insert = &trie_insert(); */
 
 		printf("trie selected\n");
 
