@@ -18,7 +18,6 @@ usage()
 int
 main(int argc, char **argv)
 {
-
 	int c;
 
 	int aflag;	/* algorithm selection switch -a used */
@@ -40,6 +39,31 @@ main(int argc, char **argv)
 		}
 	}
 
+#define MATCH(text, word) (strncmp(text, word, strlen(word)) == 0)
+
+	if( argc < 4 ) usage();
+
+	if( MATCH( aarg, "redblack" ) )
+	{
+
+		/* xxx todo: set search and insert function pointers to
+		   search_redblack and insert_redblack */
+
+		printf("redblack selected\n");
 	
+	} else if ( MATCH( aarg, "trie" ) ) {
+	
+		/* xxx todo: set search and insert function pointers to
+		   search_trie and insert_trie */
+
+		printf("trie selected\n");
+
+	} else {
+		printf("illegal algorithm selection");
+		usage();
+
+	}
+
+	printf("%i\n", argc);
 
 }
