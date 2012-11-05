@@ -28,14 +28,17 @@ void search_hash(char *key)
 {
 	ENTRY item;
 	ENTRY *found;
+	struct match *match;
 
 	item.key = key;
 
 	found = hsearch(item, FIND);
 
 	if( found == NULL ) {
-		printf("item %s not found");
+		printf("item %s not found\n", key);
 	} else {
-		printf("item %s found, xxx todo: where");
+		for( match = found->data; match; match = match->next )
+			printf("%s %u %u\n", match->filename, match->line, 
+				match->column);
 	}
 }

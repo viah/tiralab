@@ -91,6 +91,11 @@ main(int argc, char **argv)
 	unsigned int line;
 	unsigned int column;
 	struct match *match;
+	char buf[WORDMAX];
+	size_t searchlen;
+	char tmp;
+
+	int wordmaxpt = WORDMAX;
 
 	aflag = 0;
 	progname = basename(argv[0]);
@@ -163,8 +168,23 @@ main(int argc, char **argv)
 			match->column = column;
 			insert(word, match);
 		}
-
-
 		fclose(file);
+	}
+
+	i=0;
+
+	while ( ( tmp = (char)fgetc(stdin) ) != EOF )
+	{
+		if(++i >= WORDMAX) { printf("too long search word\n"); fail(); }
+
+		if( tmp == '\n' ) {
+			i = 0;
+			printf("read: %s\n", buf);
+			search(buf);
+			continue;
+		}
+
+		buf[i] = '\0';
+		buf[i-1] = tmp;
 	}
 }
