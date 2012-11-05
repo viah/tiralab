@@ -27,17 +27,20 @@ fail(void) { exit(EXIT_FAILURE); }
 int
 main(int argc, char **argv)
 {
-	int c, i;
+	int c, i, j;
 
 	int aflag;	/* algorithm selection switch -a used */
 	char *aarg;	/* name of the selected algorithm */
 
 
 	/* pointers to the selected search and insert functions 
-	   these will be set whet the command line arguments are parsed */
+	   these will be set when the command line arguments are parsed */
 
 	void (*insert)(char *key, struct match *node);
 	void (*search)(char *key);
+
+	char line[LINEMAX]; /* line and file are used when reading in files */
+	FILE *file;  
 
 	aflag = 0;
 	progname = basename(argv[0]);
@@ -54,6 +57,9 @@ main(int argc, char **argv)
 			usage();
 		}
 	}
+
+/* xxx todo: the following macro needs to be fixed. the current one 
+   matches too much ie. triesadjasid, etc. */
 
 #define MATCH(text, word) (strncmp(text, word, strlen(word)) == 0)
 
@@ -92,9 +98,21 @@ main(int argc, char **argv)
 
 	for( i = 3 ; i < argc ; i++ )  /* 3rd argument is the first file arg */
 	{
-		printf("%i: %s\n", i, argv[i]);
-
 		/* should we check for dublicate files? */
-		
+
+		file = fopen(argv[i], "r");
+
+		if(file == NULL){printf("no such file: %s\n", argv[i]); fail();}
+
+		j = 0; /* line counter */
+
+		while( fgets(line, LINEMAX, file) != NULL )
+		{
+			j++;
+			printf("file: %s line: %i content: %s\n",
+				argv[i], j, line);
+		}
+
+		fclose(file);
 	}
 }
