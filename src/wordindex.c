@@ -5,11 +5,10 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "wordindex.h"
-
 #include "hashtable.h"
 #include "redblack.h"
 #include "trie.h"
+#include "wordindex.h"
 
 char const *progname;
 
@@ -32,6 +31,10 @@ main(int argc, char **argv)
 
 	int aflag;	/* algorithm selection switch -a used */
 	char *aarg;	/* name of the selected algorithm */
+
+
+	/* pointers to the selected search and insert functions 
+	   these will be set whet the command line arguments are parsed */
 
 	void (*insert)(char *key, struct match *node);
 	void (*search)(char *key);
@@ -58,29 +61,15 @@ main(int argc, char **argv)
 
 	if( MATCH( aarg, "redblack" ) )
 	{
-
-
-		/* xxx todo: set search and insert function pointers to
-		   search_redblack and insert_redblack and initialize
-		   the selected datastructure */
-
-		/* redblack_initialize(); */
-		/* search = &redblack_search(); */
-		/* insert = &redblack_insert(); */
-
-		printf("redblack selected\n");
+		init_redblack();
+		search = &search_redblack;
+		insert = &insert_redblack;
 	
 	} else if ( MATCH( aarg, "trie" ) ) {
-	
-		/* xxx todo: set search and insert function pointers to
-		   search_trie and insert_trie and initialize the selected 
-		   datastructure */
 
-		/* trie_initialize(); */
-		/* search = &trie_search(); */
-		/* insert = &trie_insert(); */
-
-		printf("trie selected\n");
+		init_trie();
+		search = &search_trie;
+		insert = &insert_trie;
 
 	}  else if ( MATCH( aarg, "hash" ) ) {
 
@@ -88,23 +77,20 @@ main(int argc, char **argv)
 		   fuctions provided by the operating system in search.h
 		   as described by the IEEE Std 1003.1-2008. This search type
 		   is implemented for testing the program bulk not including
-		   the data structure code for trie and redblack trees */
+		   the data structure code for trie and redblack trees. */
 		   
-		printf("hash selected\n");
-
 		init_hash();
 		search = &search_hash;
 		insert = &insert_hash;
 
 	} else {
-
 		printf("illegal algorithm selection\n");
 		usage();
 	}
 
-	/* read the files to the selected data structure */
+	/* read the files into the selected data structure */
 
-	for( i = 3 ; i < argc ; i++ )
+	for( i = 3 ; i < argc ; i++ )  /* 3rd argument is the first file arg */
 	{
 		printf("%i: %s\n", i, argv[i]);
 
