@@ -9,7 +9,7 @@
 struct match {
         char *filename;
         unsigned int line;
-        unsigned int coumn;
+        unsigned int column;
         struct match *next;
 };
 

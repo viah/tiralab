@@ -9,10 +9,19 @@ void init_hash(void) { if( hcreate(500) != 0 ) fail; }
 void insert_hash(char *key, struct match *node)
 {
 	ENTRY item;
+	ENTRY *found;
+
 	item.key = key;
 	item.data = node;
 
-	if( hsearch(item, ENTER) == NULL ) fail();
+	struct match *tmp;
+
+	if( (found = hsearch(item, FIND)) ) {
+		node->next = found->data;
+		found->data = node;
+	} else {
+		if( hsearch(item, ENTER) == NULL ) fail();
+	}
 }
 
 void search_hash(char *key)

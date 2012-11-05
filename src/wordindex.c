@@ -24,6 +24,53 @@ usage(void)
 void
 fail(void) { exit(EXIT_FAILURE); }
 
+char *
+getword( FILE *file, unsigned int *line, unsigned int *column )
+{
+	static unsigned int lineno = 1;
+	static unsigned int colno = 1;
+
+	char ch;
+	char *word;
+	unsigned int wordsize = 1;
+	int col = 1;
+
+	/* skip non word chars */
+	while (	(ch = (char)fgetc(file)) != EOF )
+	{
+		if( isspace(ch) || ispunct(ch) ) { col++; continue; }
+		else if( ch == '\n') { lineno++; colno = 1; continue; }
+		else { ungetc(ch, file); break; }
+	}
+
+	if( ch == EOF ) { lineno = 1; colno = 1; return NULL; }
+
+	word = malloc(sizeof(char));
+
+	for ( ;; )
+	{
+
+		ch = (char)fgetc(file);
+
+		if( isspace(ch) || ispunct(ch) || ch == '\n' || ch == '\0' )
+		{
+			ungetc(ch, file);
+			break;
+		} else {
+			colno++;
+			wordsize++;
+			word = realloc(word, wordsize * sizeof(char));
+			word[wordsize-2] = ch;
+			word[wordsize-1] = '\0';
+		}
+	}
+
+	*line = lineno;
+	*column = colno;
+
+	return word;
+}
+
 int
 main(int argc, char **argv)
 {
@@ -40,10 +87,10 @@ main(int argc, char **argv)
 
 	/* file, word and character: used when reading in files */
 	FILE *file;  
-	char word[WORDMAX];
-	int wordcount;
-	char character;
-	int charcount;
+	char *word;
+	unsigned int line;
+	unsigned int column;
+	struct match *match;
 
 	aflag = 0;
 	progname = basename(argv[0]);
@@ -101,27 +148,22 @@ main(int argc, char **argv)
 
 	for( i = 3 ; i < argc ; i++ )  /* 3rd argument is the first file arg */
 	{
-		/* should we check for dublicate files? */
-
 		file = fopen(argv[i], "r");
 
 		if(file == NULL){printf("no such file: %s\n", argv[i]); fail();}
 
-		linecount = 1;
-		charcount = 1;
-
-		while( (character = fgetc(file)) != EOF) )
+		while( ( word = getword(file, &line, &column) ) != NULL )
 		{
-			if( character = '\n' ) {
-				charcount = 1;
-				linecount++;
-			}
+			match = malloc(sizeof(struct match));
 
-			if ( isspace(ch) || ispunct(ch) )
-			j++;
-			printf("file: %s line: %i content: %s\n",
-				argv[i], j, line);
+			if(match == NULL) { fail(); }
+
+			match->filename = argv[i];
+			match->line = line;
+			match->column = column;
+			insert(word, match);
 		}
+
 
 		fclose(file);
 	}
