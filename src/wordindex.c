@@ -32,7 +32,6 @@ main(int argc, char **argv)
 	int aflag;	/* algorithm selection switch -a used */
 	char *aarg;	/* name of the selected algorithm */
 
-
 	/* pointers to the selected search and insert functions 
 	   these will be set when the command line arguments are parsed */
 
@@ -108,6 +107,8 @@ main(int argc, char **argv)
 
 		while( fgets(line, LINEMAX, file) != NULL )
 		{
+			while ( (ch = fgetc(file)) != EOF )
+			if ( isspace(ch) || ispunct(ch) )
 			j++;
 			printf("file: %s line: %i content: %s\n",
 				argv[i], j, line);
