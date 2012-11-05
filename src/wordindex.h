@@ -4,7 +4,7 @@
 #ifndef WORDINDEX_H
 #define WORDINDEX_H 1
 
-#define LINEMAX 2048
+#define WORDMAX 512
 
 struct match {
         char *filename;

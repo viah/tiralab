@@ -27,7 +27,7 @@ fail(void) { exit(EXIT_FAILURE); }
 int
 main(int argc, char **argv)
 {
-	int c, i, j;
+	int c, i;
 
 	int aflag;	/* algorithm selection switch -a used */
 	char *aarg;	/* name of the selected algorithm */
@@ -38,8 +38,12 @@ main(int argc, char **argv)
 	void (*insert)(char *key, struct match *node);
 	void (*search)(char *key);
 
-	char line[LINEMAX]; /* line and file are used when reading in files */
+	/* file, word and character: used when reading in files */
 	FILE *file;  
+	char word[WORDMAX];
+	int wordcount;
+	char character;
+	int charcount;
 
 	aflag = 0;
 	progname = basename(argv[0]);
@@ -103,11 +107,16 @@ main(int argc, char **argv)
 
 		if(file == NULL){printf("no such file: %s\n", argv[i]); fail();}
 
-		j = 0; /* line counter */
+		linecount = 1;
+		charcount = 1;
 
-		while( fgets(line, LINEMAX, file) != NULL )
+		while( (character = fgetc(file)) != EOF) )
 		{
-			while ( (ch = fgetc(file)) != EOF )
+			if( character = '\n' ) {
+				charcount = 1;
+				linecount++;
+			}
+
 			if ( isspace(ch) || ispunct(ch) )
 			j++;
 			printf("file: %s line: %i content: %s\n",
