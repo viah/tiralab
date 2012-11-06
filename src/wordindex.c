@@ -12,6 +12,11 @@
 
 char const *progname;
 
+/* Error handling is simple and done by the usage and fail functions. 
+   Return values of the internal functions of this program are not
+   checked. Insted, we just call the fail() and usage() in case of a
+   problem. More complex error handling would be waste of effort. */
+
 void
 usage(void)
 {
@@ -27,6 +32,8 @@ fail(void) { exit(EXIT_FAILURE); }
 char *
 getword( FILE *file, unsigned int *line, unsigned int *column )
 {
+	/* xxx todo: fix incorrect line and column values */
+
 	static unsigned int lineno = 1;
 	static unsigned int colno = 1;
 
@@ -35,7 +42,7 @@ getword( FILE *file, unsigned int *line, unsigned int *column )
 	unsigned int wordsize = 1;
 	int col = 1;
 
-	/* skip non word chars */
+	/* Skip non word chars */
 	while (	(ch = (char)fgetc(file)) != EOF )
 	{
 		if( isspace(ch) || ispunct(ch) ) { col++; continue; }
@@ -43,7 +50,11 @@ getword( FILE *file, unsigned int *line, unsigned int *column )
 		else { ungetc(ch, file); break; }
 	}
 
+	/* If end-of-file is reached, reset counter and return NULL */
+
 	if( ch == EOF ) { lineno = 1; colno = 1; return NULL; }
+
+	/* Allocate space for the first letter of the word begin read */
 
 	word = malloc(sizeof(char));
 
@@ -54,9 +65,21 @@ getword( FILE *file, unsigned int *line, unsigned int *column )
 
 		if( isspace(ch) || ispunct(ch) || ch == '\n' || ch == '\0' )
 		{
+			/* We get here when a word has been read and the
+			 * next character not belonging to the word is read.
+			 *
+			 * We just put the char back to the strem and handle 
+			 * it in the section above ie, "Skip non word chars".
+			 */
+
 			ungetc(ch, file);
 			break;
+
 		} else {
+
+			/* Next new char belonging to the word has beed read.
+			 * Allocate more space and null terminate. */
+
 			colno++;
 			wordsize++;
 			word = realloc(word, wordsize * sizeof(char));
@@ -76,29 +99,31 @@ main(int argc, char **argv)
 {
 	int c, i;
 
-	int aflag;	/* algorithm selection switch -a used */
-	char *aarg;	/* name of the selected algorithm */
+	int aflag;	/* Algorithm selection switch -a used. */
+	char *aarg;	/* Name of the selected algorithm. */
 
-	/* pointers to the selected search and insert functions 
-	   these will be set when the command line arguments are parsed */
+	/* Pointers to the selected search and insert functions. These 
+	 * will be set when the command line arguments are parsed later. */
 
 	void (*insert)(char *key, struct match *node);
 	void (*search)(char *key);
 
-	/* file, word and character: used when reading in files */
+	/* The following are used when reading in files. Struct match
+	 * will be placed in the selected data structure and it stores
+	 * all we need to know about each match ie. filename, line and 
+	 * column. The readword() fuction placeses the line and column
+	 * values using pointers to these variables. */
+
 	FILE *file;  
 	char *word;
 	unsigned int line;
 	unsigned int column;
 	struct match *match;
-	char buf[WORDMAX];
-	size_t searchlen;
-	char tmp;
-
-	int wordmaxpt = WORDMAX;
 
 	aflag = 0;
 	progname = basename(argv[0]);
+
+	/* Commandline argument parsing. */
 
 	while( ( c = getopt(argc, argv, "a:") ) != -1 )
 	{
@@ -119,6 +144,8 @@ main(int argc, char **argv)
 #define MATCH(text, word) (strncmp(text, word, strlen(word)) == 0)
 
 	if( argc < 4 ) usage();
+
+	/* Find which data structure was selected using command line args. */
 
 	if( MATCH( aarg, "redblack" ) )
 	{
@@ -149,7 +176,8 @@ main(int argc, char **argv)
 		usage();
 	}
 
-	/* read the files into the selected data structure */
+
+	/* Read the files into the selected data structure. */
 
 	for( i = 3 ; i < argc ; i++ )  /* 3rd argument is the first file arg */
 	{
@@ -171,20 +199,14 @@ main(int argc, char **argv)
 		fclose(file);
 	}
 
-	i=0;
 
-	while ( ( tmp = (char)fgetc(stdin) ) != EOF )
+	/* Search word by word */
+
+	while( ( word = getword(stdin, &line, &column) ) != NULL )
 	{
-		if(++i >= WORDMAX) { printf("too long search word\n"); fail(); }
-
-		if( tmp == '\n' ) {
-			i = 0;
-			printf("read: %s\n", buf);
-			search(buf);
-			continue;
-		}
-
-		buf[i] = '\0';
-		buf[i-1] = tmp;
+		search(word);
+		free(word);
 	}
+
+	return(EXIT_SUCCESS);
 }

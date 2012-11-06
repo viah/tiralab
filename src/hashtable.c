@@ -35,10 +35,10 @@ void search_hash(char *key)
 	found = hsearch(item, FIND);
 
 	if( found == NULL ) {
-		printf("item %s not found\n", key);
+		printf("%s:\n", key);
 	} else {
 		for( match = found->data; match; match = match->next )
-			printf("%s %u %u\n", match->filename, match->line, 
-				match->column);
+			printf("%s: %s %u %u\n", key, match->filename, 
+				match->line, match->column);
 	}
 }
