@@ -1,6 +1,7 @@
 #include <ctype.h>
 #include <libgen.h>
 #include <search.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -29,7 +30,15 @@ usage(void)
 
 
 void
-fail(void) { exit(EXIT_FAILURE); }
+fail(const char * fmt, ...)
+{
+	va_list args;
+	va_start(args, fmt);
+	fprintf(stderr, fmt, args);
+	fprintf(stderr, "\n");
+	va_end(args);
+	exit(EXIT_FAILURE);
+}
 
 
 char *
@@ -41,20 +50,16 @@ getword( FILE *file, unsigned int *line, unsigned int *column )
 	 * the begining of the word. The space for the word will be 
 	 * allocated on the fly and the word will be null terminated. */
 
-
-	/* Book keeping variables */
-
-	static unsigned int lineno = 1; /* Current line */
-	static unsigned int colno = 1;  /* Current column */
-
 	char ch;			/* Character begin read in */
 	char *word;			/* Pointer to the word */
 	int wordon = 0;			/* Flag, reading char in a word */
 	unsigned int wordsize = 1;	/* Current size of the word */ 
 	unsigned int startcol = 1;	/* Where did the word start */
+	static unsigned int lineno = 1; /* Current line, static */
+	static unsigned int colno = 1;  /* Current column, static */
 
 
-	/* First, let's skip any non word chars. */
+	/* First, skip any non word chars. */
 
 	while (	(ch = (char)fgetc(file)) != EOF )
 	{
@@ -62,7 +67,7 @@ getword( FILE *file, unsigned int *line, unsigned int *column )
 		else if( isspace(ch) || ispunct(ch) ) { colno++; continue; }
 		else {
 
-			/* This is a character belonging to a word, lets push
+			/* This is a character belonging to a word, let's push 
 			 * it back to the stream. We will handle it later. */
 
 			ungetc(ch, file);
@@ -70,25 +75,20 @@ getword( FILE *file, unsigned int *line, unsigned int *column )
 		}
 	}
 
-
-	/* If end-of-file is reached, reset counters and return NULL */
-
 	if( ch == EOF ) { lineno = 1; colno = 1; return NULL; }
 
 
-	/* Allocate space for the word begin read. */
+	/* Allocate space for the word. Initially only a empty string. */
 
 	word = malloc(sizeof(char));
 	word[0] = '\0';
 
-	/* xxx todo:	check that this code handles the situation where there 
-	 * 		is no '\n' before eof. currently i think it will not 
-	 * 		handle it but not sure. */
-
-	/* Read characters belonging to the next word */
+	/* Read characters belonging to a word */
 	for ( ;; )
 	{
 		ch = (char)fgetc(file);
+
+		if( ch == EOF ) break; /* no newline at the end of file */
 
 		if( isspace(ch) || ispunct(ch) || ch == '\n' || ch == '\0' )
 		{
@@ -116,7 +116,6 @@ getword( FILE *file, unsigned int *line, unsigned int *column )
 			colno++;
 			wordsize++;
 
-			/* xxx todo: this is slow: */
 			word = realloc(word, wordsize * sizeof(char));
 			word[wordsize-2] = ch;
 			word[wordsize-1] = '\0';
@@ -219,13 +218,13 @@ main(int argc, char **argv)
 	{
 		file = fopen(argv[i], "r");
 
-		if(file == NULL){printf("no such file: %s\n", argv[i]); fail();}
+		if(file == NULL){ fail("no such file: %s\n", argv[i]); }
 
 		while( ( word = getword(file, &line, &column) ) != NULL )
 		{
 			match = malloc(sizeof(struct match));
 
-			if(match == NULL) { fail(); }
+			if(match == NULL) { fail("malloc failed\n"); }
 
 			match->filename = argv[i];
 			match->line = line;

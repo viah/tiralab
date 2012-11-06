@@ -15,6 +15,6 @@ struct match {
 
 void usage(void);
 
-void fail(void);
+void fail(const char* fmt, ...);
 
 #endif

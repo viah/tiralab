@@ -4,16 +4,14 @@
 #include "wordindex.h"
 
 void init_trie(void) {
-	printf("not implemented\n");
-	fail(); }
+	fail("not implemented\n");
+}
 
 void insert_trie(char *key, struct match *node) {
-	printf("not implemented\n");
-	fail();
+	fail("not implemented\n");
 }
 
 void search_trie(char *key)
 {
-	printf("not implemented\n");
-	fail();
+	fail("not implemented\n");
 }

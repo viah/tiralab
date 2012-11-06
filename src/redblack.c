@@ -4,16 +4,14 @@
 #include "wordindex.h"
 
 void init_redblack(void) {
-	printf("not implemented\n");
-	fail(); }
+	fail("not implemented\n");
+}
 
 void insert_redblack(char *key, struct match *node) {
-	printf("not implemented\n");
-	fail();
+	fail("not implemented\n");
 }
 
 void search_redblack(char *key)
 {
-	printf("not implemented\n");
-	fail();
+	fail("not implemented\n");
 }

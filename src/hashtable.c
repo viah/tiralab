@@ -2,9 +2,15 @@
 #include <stdio.h>
 #include <search.h>
 
+#include "hashtable.h"
 #include "wordindex.h"
 
-void init_hash(void) { if( hcreate(1000) == 0 ) fail(); }
+void init_hash(void) {
+	if( hcreate(HASHSIZE) == 0 )
+	{
+		fail("hcreate failed");
+	}
+}
 
 void insert_hash(char *key, struct match *node)
 {
@@ -18,7 +24,10 @@ void insert_hash(char *key, struct match *node)
 		node->next = found->data;
 		found->data = node;
 	} else {
-		if( hsearch(item, ENTER) == NULL ) fail();
+		if( hsearch(item, ENTER) == NULL ) 
+		{
+			fail("hsearch failed");
+		}
 	}
 }
 
@@ -35,6 +44,9 @@ void search_hash(char *key)
 	if( found == NULL ) {
 		printf("%s:\n", key);
 	} else {
+		/* xxx todo:	move this elsewhere, match list printing will be
+		 * 		needed for all algorithms
+		 */
 		for( match = found->data; match; match = match->next )
 			printf("%s: %s %u %u\n", key, match->filename, 
 				match->line, match->column);
