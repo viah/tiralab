@@ -12,10 +12,9 @@
 
 char const *progname;
 
-/* Error handling is simple and done by the usage and fail functions. 
-   Return values of the internal functions of this program are not
-   checked. Insted, we just call the fail() and usage() in case of a
-   problem. More complex error handling would be waste of effort. */
+/* The error handling is simple and done by the usage and fail functions. 
+ * Return values of the internal functions of this program are not checked.
+ * Insted, we just call the fail() and usage() in case of problems. */
 
 void
 usage(void)
@@ -32,44 +31,71 @@ fail(void) { exit(EXIT_FAILURE); }
 char *
 getword( FILE *file, unsigned int *line, unsigned int *column )
 {
-	/* xxx todo: fix incorrect line and column values */
+	/* Reads the next word from file stream pointed to by FILE *file.
+	 * Placeses the line and column of the returned  word into memory 
+	 * pointed to by pointers *line and *column. Returns a pointer to
+	 * the begining of the word. The space for the word will be 
+	 * allocated on the fly and the word will be null terminated. */
+
+	/* Book keeping variables */
 
 	static unsigned int lineno = 1;
 	static unsigned int colno = 1;
 
-	char ch;
-	char *word;
-	unsigned int wordsize = 1;
-	int col = 1;
+	char ch;			/* Character begin read in */
+	char *word;			/* Pointer to the word */
+	int wordon = 0;			/* Flag, reading char in a word */
+	unsigned int wordsize = 1;	/* Current size of the word */ 
+	unsigned int startcol = 1;	/* Where did the word start */
 
-	/* Skip non word chars */
+
+	/* First, let's skip any non word chars. */
+
 	while (	(ch = (char)fgetc(file)) != EOF )
 	{
-		if( isspace(ch) || ispunct(ch) ) { col++; continue; }
-		else if( ch == '\n') { lineno++; colno = 1; continue; }
-		else { ungetc(ch, file); break; }
+		if( ch == '\n') { lineno++; colno = 1; continue; }
+		else if( isspace(ch) || ispunct(ch) ) { colno++; continue; }
+		else {
+
+			/* This is a character belonging to a word, lets push
+			 * it back to the stream. We will handle it later. */
+
+			ungetc(ch, file);
+			break;
+		}
 	}
+
 
 	/* If end-of-file is reached, reset counter and return NULL */
 
 	if( ch == EOF ) { lineno = 1; colno = 1; return NULL; }
 
-	/* Allocate space for the first letter of the word begin read */
+
+	/* Allocate space for the word begin read. */
 
 	word = malloc(sizeof(char));
+	word[0] = '\0';
 
+	/* xxx todo:	check that this code handles the situation where there 
+	 * 		is no \n before eof. currently i think it will not 
+	 * 		handle it but not sure. */
+
+	/* Read characters belonging to the next word */
 	for ( ;; )
 	{
-
 		ch = (char)fgetc(file);
 
 		if( isspace(ch) || ispunct(ch) || ch == '\n' || ch == '\0' )
 		{
+			wordon = 0;
+
 			/* We get here when a word has been read and the
 			 * next character not belonging to the word is read.
 			 *
-			 * We just put the char back to the strem and handle 
-			 * it in the section above ie, "Skip non word chars".
+			 * We will push the char back to the stream and handle 
+			 * it when the getword() is called again.
+			 *
+			 * (See "skip any non word" above.)
 			 */
 
 			ungetc(ch, file);
@@ -78,7 +104,9 @@ getword( FILE *file, unsigned int *line, unsigned int *column )
 		} else {
 
 			/* Next new char belonging to the word has beed read.
-			 * Allocate more space and null terminate. */
+			 * Allocate space for it and null terminate. */
+
+			if(!wordon) { startcol = colno; wordon = 1; }
 
 			colno++;
 			wordsize++;
@@ -89,7 +117,7 @@ getword( FILE *file, unsigned int *line, unsigned int *column )
 	}
 
 	*line = lineno;
-	*column = colno;
+	*column = startcol;
 
 	return word;
 }
@@ -102,16 +130,18 @@ main(int argc, char **argv)
 	int aflag;	/* Algorithm selection switch -a used. */
 	char *aarg;	/* Name of the selected algorithm. */
 
+
 	/* Pointers to the selected search and insert functions. These 
 	 * will be set when the command line arguments are parsed later. */
 
 	void (*insert)(char *key, struct match *node);
 	void (*search)(char *key);
 
-	/* The following are used when reading in files. Struct match
-	 * will be placed in the selected data structure and it stores
-	 * all we need to know about each match ie. filename, line and 
-	 * column. The readword() fuction placeses the line and column
+
+	/* The following variables are used when reading in files. Struct 
+	 * match * will be placed in the selected data structure and it 
+	 * stores all we need to know about each match ie. filename, line 
+	 * and column. The readword() fuction placeses the line and column
 	 * values using pointers to these variables. */
 
 	FILE *file;  
@@ -122,6 +152,7 @@ main(int argc, char **argv)
 
 	aflag = 0;
 	progname = basename(argv[0]);
+
 
 	/* Commandline argument parsing. */
 
@@ -145,7 +176,7 @@ main(int argc, char **argv)
 
 	if( argc < 4 ) usage();
 
-	/* Find which data structure was selected using command line args. */
+	/* Find which data structure was selected, if any.  */
 
 	if( MATCH( aarg, "redblack" ) )
 	{
@@ -200,7 +231,7 @@ main(int argc, char **argv)
 	}
 
 
-	/* Search word by word */
+	/* Search word by word. */
 
 	while( ( word = getword(stdin, &line, &column) ) != NULL )
 	{
