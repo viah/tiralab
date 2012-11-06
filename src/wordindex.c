@@ -12,9 +12,10 @@
 
 char const *progname;
 
-/* The error handling is simple and done by the usage and fail functions. 
- * Return values of the internal functions of this program are not checked.
- * Insted, we just call the fail() and usage() in case of problems. */
+
+/* The error handling is simple and done by the usage() and fail() functions. 
+ * Return values of the internal functions are not checked. Instead, we 
+ * call the fail() or usage() functions in case of any problems. */
 
 void
 usage(void)
@@ -25,22 +26,25 @@ usage(void)
 	exit(EXIT_FAILURE);
 }
 
+
 void
 fail(void) { exit(EXIT_FAILURE); }
+
 
 char *
 getword( FILE *file, unsigned int *line, unsigned int *column )
 {
 	/* Reads the next word from file stream pointed to by FILE *file.
-	 * Placeses the line and column of the returned  word into memory 
+	 * Places the line and column of the returned word into memory 
 	 * pointed to by pointers *line and *column. Returns a pointer to
 	 * the begining of the word. The space for the word will be 
 	 * allocated on the fly and the word will be null terminated. */
 
+
 	/* Book keeping variables */
 
-	static unsigned int lineno = 1;
-	static unsigned int colno = 1;
+	static unsigned int lineno = 1; /* Current line */
+	static unsigned int colno = 1;  /* Current column */
 
 	char ch;			/* Character begin read in */
 	char *word;			/* Pointer to the word */
@@ -66,7 +70,7 @@ getword( FILE *file, unsigned int *line, unsigned int *column )
 	}
 
 
-	/* If end-of-file is reached, reset counter and return NULL */
+	/* If end-of-file is reached, reset counters and return NULL */
 
 	if( ch == EOF ) { lineno = 1; colno = 1; return NULL; }
 
@@ -77,7 +81,7 @@ getword( FILE *file, unsigned int *line, unsigned int *column )
 	word[0] = '\0';
 
 	/* xxx todo:	check that this code handles the situation where there 
-	 * 		is no \n before eof. currently i think it will not 
+	 * 		is no '\n' before eof. currently i think it will not 
 	 * 		handle it but not sure. */
 
 	/* Read characters belonging to the next word */
@@ -110,6 +114,8 @@ getword( FILE *file, unsigned int *line, unsigned int *column )
 
 			colno++;
 			wordsize++;
+
+			/* xxx todo: this is slow: */
 			word = realloc(word, wordsize * sizeof(char));
 			word[wordsize-2] = ch;
 			word[wordsize-1] = '\0';
@@ -139,10 +145,10 @@ main(int argc, char **argv)
 
 
 	/* The following variables are used when reading in files. Struct 
-	 * match * will be placed in the selected data structure and it 
-	 * stores all we need to know about each match ie. filename, line 
-	 * and column. The readword() fuction placeses the line and column
-	 * values using pointers to these variables. */
+	 * match will be pointed to from the selected data structure and it 
+	 * stores all we need to know about each match ie. filename (pointer), 
+	 * line and column. The readword() fuction placeses the line and column
+	 * values using pointers to the locations of these variables. */
 
 	FILE *file;  
 	char *word;
@@ -169,14 +175,12 @@ main(int argc, char **argv)
 		}
 	}
 
-/* xxx todo: the following macro needs to be fixed. the current one 
-   matches too much ie. triesadjasid, etc. */
-
-#define MATCH(text, word) (strncmp(text, word, strlen(word)) == 0)
+#define MATCH(word1, word2) (   (strncmp(word1,word2,strlen(word1))==0) && \
+			        (strlen(word1) == strlen(word2))              )
 
 	if( argc < 4 ) usage();
 
-	/* Find which data structure was selected, if any.  */
+	/* Check which data structure was selected, if any.  */
 
 	if( MATCH( aarg, "redblack" ) )
 	{
