@@ -41,6 +41,23 @@ fail(const char * fmt, ...)
 }
 
 
+void
+print_matches(char *key, struct match *first )
+{
+	/* This function is called from the data structure specific 
+	 * (trie, redblack, hash) search functions to print the linked
+	 * list containing all the matches for a specific word */
+
+	struct match *match;
+
+	if(first == NULL) fail("no items in the match list\n");
+
+	for( match = first; match; match = match->next )
+		printf("%s: %s %u %u\n", key, match->filename,
+			match->line, match->column);
+}
+
+
 int
 main(int argc, char **argv)
 {

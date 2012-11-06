@@ -35,20 +35,11 @@ void search_hash(char *key)
 {
 	ENTRY item;
 	ENTRY *found;
-	struct match *match;
 
 	item.key = key;
 
 	found = hsearch(item, FIND);
 
-	if( found == NULL ) {
-		printf("%s:\n", key);
-	} else {
-		/* xxx todo:	move this elsewhere, match list printing will be
-		 * 		needed for all algorithms
-		 */
-		for( match = found->data; match; match = match->next )
-			printf("%s: %s %u %u\n", key, match->filename, 
-				match->line, match->column);
-	}
+	if( found == NULL ) { printf("%s:\n", key); }
+	else { print_matches(key, (struct match*)found->data ); }
 }

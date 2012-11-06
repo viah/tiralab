@@ -3,8 +3,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define HANDLE_EOF if( ch == EOF ) { lineno = 1; colno = 1; return NULL; }
-
 char *
 getword( FILE *file, unsigned int *line, unsigned int *column )
 {
@@ -39,7 +37,7 @@ getword( FILE *file, unsigned int *line, unsigned int *column )
 		}
 	}
 
-	HANDLE_EOF;
+	if( ch == EOF ) { lineno = 1; colno = 1; return NULL; }
 
 
 	/* Allocate space for the word. Initially only a empty string. */
@@ -52,7 +50,13 @@ getword( FILE *file, unsigned int *line, unsigned int *column )
 	{
 		ch = (char)fgetc(file);
 
-		HANDLE_EOF; /* No new-line at the end of the file */
+		if( ch == EOF ) {
+
+			/* We get here if there is no new-line char at the
+			 * end of the file after the last word. */
+
+			lineno = 1; colno = 1; break;
+		}
 
 		if( isspace(ch) || ispunct(ch) || ch == '\n' || ch == '\0' )
 		{

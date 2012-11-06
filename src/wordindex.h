@@ -17,4 +17,6 @@ void usage(void);
 
 void fail(const char* fmt, ...);
 
+void print_matches(char *, struct match *);
+
 #endif
