@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include <libgen.h>
 #include <search.h>
 #include <stdio.h>
@@ -147,7 +148,7 @@ main(int argc, char **argv)
 	/* The following variables are used when reading in files. Struct 
 	 * match will be pointed to from the selected data structure and it 
 	 * stores all we need to know about each match ie. filename (pointer), 
-	 * line and column. The readword() fuction placeses the line and column
+	 * line and column. The readword() fuction places the line and column
 	 * values using pointers to the locations of these variables. */
 
 	FILE *file;  
@@ -160,7 +161,7 @@ main(int argc, char **argv)
 	progname = basename(argv[0]);
 
 
-	/* Commandline argument parsing. */
+	/* Command line argument parsing. */
 
 	while( ( c = getopt(argc, argv, "a:") ) != -1 )
 	{

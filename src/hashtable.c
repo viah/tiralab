@@ -4,7 +4,7 @@
 
 #include "wordindex.h"
 
-void init_hash(void) { if( hcreate(500) != 0 ) fail; }
+void init_hash(void) { if( hcreate(1000) == 0 ) fail(); }
 
 void insert_hash(char *key, struct match *node)
 {
@@ -13,8 +13,6 @@ void insert_hash(char *key, struct match *node)
 
 	item.key = key;
 	item.data = node;
-
-	struct match *tmp;
 
 	if( (found = hsearch(item, FIND)) ) {
 		node->next = found->data;
