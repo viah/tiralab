@@ -39,33 +39,57 @@ void insert_redblack(char *key, Match *match) {
 	   then try to figure out how to make the tree conform to the rb
 	   rules. */
 
-	while(cur != NULL)
+	for( cur = root ; cur != NULL ; )
 	{
-		cmp = strncmp(cur->key, new->key, sizeof(cur->key));
+		printf("here: %s\n", cur->key);
+
+		cmp = strncmp(cur->key, key, sizeof(cur->key));
 
 		if(cmp > 0) {
-			if(cur->left == NULL) { cur->left = new; return; }
+			printf(" key %s, > %s\n", cur->key, key);
+			if(cur->left == NULL) { cur->left = new; break; }
 			else { cur = cur->left; }
-		} 
+		}
 		else if( cmp < 0) {
-			if(cur->right == NULL) { cur->right = new; return; }
+			printf(" key %s, < %s\n", cur->key, key);
+			if(cur->right == NULL) { cur->right = new; break; }
 			else { cur = cur->right; }
 		}
 		else {
+			printf(" key %s, == %s\n", cur->key, key);
 			add_match( cur->match, new->match );
 			free(new); /* xxx todo: dont like this, why allocate
 					the node in the first place if we
 					free it here? refactor */ 
+			break;
 		}
-
 	}
-
-	
-
-	fail("not implemented\n");
 }
 
 void search_redblack(char *key)
 {
-	fail("not implemented\n");
+	int cmp;
+	RBnode *cur;    /* used for iterating through nodes */
+
+	cur = root;
+	
+
+	while(cur != NULL)
+	{
+		cmp = strncmp(cur->key, key, sizeof(cur->key));
+
+		if(cmp > 0) {
+			if(cur->left == NULL) { break; }
+			else { cur = cur->left; }
+		}
+		else if( cmp < 0) {
+			if(cur->right == NULL) { break; }
+			else { cur = cur->right; }
+		}
+		else {
+			print_matches(key, cur->match);
+			return;
+		}
+	}
+	printf("%s:\n", key);
 }

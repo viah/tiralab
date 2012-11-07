@@ -58,14 +58,6 @@ print_matches(char *key, struct match *first )
 }
 
 
-void
-add_match(struct match *first, struct match *new)
-{
-	new->next = first;
-	first = new;
-}
-
-
 int
 main(int argc, char **argv)
 {
@@ -160,6 +152,7 @@ main(int argc, char **argv)
 
 		while( ( word = getword(file, &line, &column) ) != NULL )
 		{
+			printf("got word %s\n", word);
 			match = malloc(sizeof(struct match));
 
 			if(match == NULL) { fail("malloc failed\n"); }
