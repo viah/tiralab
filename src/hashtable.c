@@ -21,8 +21,7 @@ void insert_hash(char *key, struct match *node)
 	item.data = node;
 
 	if( (found = hsearch(item, FIND)) ) {
-		node->next = found->data;
-		found->data = node;
+		add_match(found->data, node);
 	} else {
 		if( hsearch(item, ENTER) == NULL ) 
 		{

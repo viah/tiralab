@@ -1,6 +1,6 @@
-
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "redblack.h"
 #include "wordindex.h"
@@ -13,25 +13,52 @@ void init_redblack(void) {
 
 void insert_redblack(char *key, Match *match) {
 
-	RBnode *rbn;
+	int cmp;	/* key comparation result */
+	RBnode *new;	/* the new node to be created */
+	RBnode *cur;	/* used for iterating through nodes */
 
 	/* create new node */
-	rbn = malloc(sizeof(RBnode));
+	new = malloc(sizeof(RBnode));
 		
-	if(rbn == NULL) fail("insert_redblack(), malloc() failed");
+	if(new == NULL) fail("insert_redblack(), malloc() failed");
 
-	rbn->key = key;
-	rbn->match = match;
-	rbn->left = NULL;
-	rbn->right = NULL;
+	new->key = key;
+	new->match = match;
+	new->left = NULL;
+	new->right = NULL;
 
 	/* insert the new node in the tree */
 
 	if(root == NULL) {
-		rbn->color = BLACK;
-		root = rbn;
+		new->color = BLACK;
+		root = new;
 		return;
 	} 
+
+	/* xxx lets approach this by first doing a normal bst insert and
+	   then try to figure out how to make the tree conform to the rb
+	   rules. */
+
+	while(cur != NULL)
+	{
+		cmp = strncmp(cur->key, new->key, sizeof(cur->key));
+
+		if(cmp > 0) {
+			if(cur->left == NULL) { cur->left = new; return; }
+			else { cur = cur->left; }
+		} 
+		else if( cmp < 0) {
+			if(cur->right == NULL) { cur->right = new; return; }
+			else { cur = cur->right; }
+		}
+		else {
+			add_match( cur->match, new->match );
+			free(new); /* xxx todo: dont like this, why allocate
+					the node in the first place if we
+					free it here? refactor */ 
+		}
+
+	}
 
 	
 

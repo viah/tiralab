@@ -19,4 +19,6 @@ void fail(const char* fmt, ...);
 
 void print_matches(char *, struct match *);
 
+void add_match(struct match *, struct match *);
+
 #endif

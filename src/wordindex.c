@@ -58,6 +58,14 @@ print_matches(char *key, struct match *first )
 }
 
 
+void
+add_match(struct match *first, struct match *new)
+{
+	new->next = first;
+	first = new;
+}
+
+
 int
 main(int argc, char **argv)
 {
