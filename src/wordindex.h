@@ -11,6 +11,8 @@ struct match {
         struct match *next;
 };
 
+typedef struct match Match;
+
 void usage(void);
 
 void fail(const char* fmt, ...);
