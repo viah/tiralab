@@ -105,8 +105,7 @@ main(int argc, char **argv)
 		}
 	}
 
-#define MATCH(word1, word2) (   (strncmp(word1,word2,strlen(word1))==0) && \
-			        (strlen(word1) == strlen(word2))              )
+#define MATCH(word1, word2) (   (strcmp(word1,word2)==0)   )
 
 	if( argc < 4 ) usage();
 
@@ -152,7 +151,6 @@ main(int argc, char **argv)
 
 		while( ( word = getword(file, &line, &column) ) != NULL )
 		{
-			printf("got word %s\n", word);
 			match = malloc(sizeof(struct match));
 
 			if(match == NULL) { fail("malloc failed\n"); }

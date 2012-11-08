@@ -6,6 +6,7 @@ typedef struct RBnode {
 	char *key;
 	Match *match;
 	RBcolor color;
+	struct RBnode *parent;
 	struct RBnode *left;
 	struct RBnode *right;
 } RBnode;

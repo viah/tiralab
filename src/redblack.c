@@ -7,6 +7,26 @@
 
 static RBnode *root;
 
+static RBnode *grandparent(RBnode *node)
+{
+	return( node != NULL && node->parent != NULL && \
+		node->parent->parent != NULL ? node->parent->parent : NULL );
+}
+
+static RBnode *uncle(RBnode *node)
+{
+	RBnode *grandp;
+
+	grandp = grandparent(node);
+
+	if(grandp == NULL) return NULL;
+
+	if(grandp->left == NULL || grandp->right == NULL) return NULL;
+
+	return(grandp->left == node->parent ? grandp->right : grandp->left);
+}
+
+
 void init_redblack(void) {
 	root = (RBnode*)NULL;
 }
@@ -24,6 +44,7 @@ void insert_redblack(char *key, Match *match) {
 
 	new->key = key;
 	new->match = match;
+	new->parent = NULL;
 	new->left = NULL;
 	new->right = NULL;
 
@@ -41,26 +62,30 @@ void insert_redblack(char *key, Match *match) {
 
 	for( cur = root ; cur != NULL ; )
 	{
-		printf("here: %s\n", cur->key);
+		cmp = strcmp(cur->key, key);
 
-		cmp = strncmp(cur->key, key, sizeof(cur->key));
+		if( cmp > 0 ) {
 
-		if(cmp > 0) {
-			printf(" key %s, > %s\n", cur->key, key);
-			if(cur->left == NULL) { cur->left = new; break; }
-			else { cur = cur->left; }
-		}
-		else if( cmp < 0) {
-			printf(" key %s, < %s\n", cur->key, key);
-			if(cur->right == NULL) { cur->right = new; break; }
-			else { cur = cur->right; }
-		}
-		else {
-			printf(" key %s, == %s\n", cur->key, key);
+			if(cur->left == NULL) {
+				cur->left = new;
+				new->parent = cur;
+				break;
+			} else { cur = cur->left; }
+
+		} else if( cmp < 0 ) {
+
+			if(cur->right == NULL) {
+				cur->right = new;
+				new->parent = cur;
+				break;
+			} else { cur = cur->right; }
+
+		} else {
+
 			add_match( cur->match, new->match );
 			free(new); /* xxx todo: dont like this, why allocate
 					the node in the first place if we
-					free it here? refactor */ 
+					free it here? */ 
 			break;
 		}
 	}
@@ -71,22 +96,17 @@ void search_redblack(char *key)
 	int cmp;
 	RBnode *cur;    /* used for iterating through nodes */
 
-	cur = root;
-	
-
-	while(cur != NULL)
+	for(cur = root ; cur != NULL ; )
 	{
-		cmp = strncmp(cur->key, key, sizeof(cur->key));
+		cmp = strcmp(cur->key, key);
 
 		if(cmp > 0) {
 			if(cur->left == NULL) { break; }
 			else { cur = cur->left; }
-		}
-		else if( cmp < 0) {
+		} else if( cmp < 0) {
 			if(cur->right == NULL) { break; }
 			else { cur = cur->right; }
-		}
-		else {
+		} else {
 			print_matches(key, cur->match);
 			return;
 		}
