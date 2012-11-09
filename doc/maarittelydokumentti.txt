@@ -1,8 +1,21 @@
-Määrittelydokumentti
+
+Kurssi: Helsingin yliopisto - Tietojenkäsittelytieteen laitos - Aineopintojen harjoitustyö - 
+	Tietorakenteet ja algoritmit 
+
+Aika: 29.10.2012 - 07.12.2012
+
+Ohjaaja: Paloheimo 
+
+Suorittaja: Ahlgren
+
+Dokumentin nimi: Määrittelydokumentti
+
+---------------------------------------------------------------------------------------------------
 
  1 Mitä algoritmeja ja tietorakenteita toteutat työssäsi
 
-	Punamusta- ja trie-puut sekä lisäys ja haku algoritmit edellisiä varten.
+	Punamusta- ja trie-puut sekä lisäys ja haku algoritmit edellisiä varten. Lisäksi
+	aputietorakenteena on linkitetty lista.
 
  2 Mitä ongelmaa ratkaiset ja miksi valitsit kyseiset algoritmit/tietorakenteet
 
@@ -46,7 +59,11 @@ Määrittelydokumentti
 	O( ( k log(k) ) + ( m log(k) ) ) eli O( max{k, m} log(k) ).
 
 	Tilavaativuus on O(i * n) riippumatta tallennetaanko trie- tai punamustapuuhun.
-	
+
+	Aputietorakenteen osalta, joka on linkitetty lista, on tilavaatimus O(n) ja listan
+	läpikäynnin aikavaatimus O(n) ja listalle lisääminen O(1), jossa n listalla olevien
+	solmujen määrä.
+
  5 Lähteet
 
 	1. Kurssi sivu - http://www.cs.helsinki.fi/node/75614 - 2.11.2012
