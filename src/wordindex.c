@@ -12,7 +12,9 @@
 #include "trie.h"
 #include "wordindex.h"
 
-char const *progname;
+char const *progname;	/* name of the called program */
+
+int dflag;		/* prorgram wide debugging flag */
 
 
 /* The error handling is simple and done by the usage() and fail() functions. 
@@ -22,22 +24,38 @@ char const *progname;
 void
 usage(void)
 {
-	printf("usage: %s -a [redblack|trie|hash] <file 1> "
+	printf("usage: %s -a redblack|trie|hash [-d] <file 1> "
 	       "<file 2> ... <file n>\n", progname);
 
 	exit(EXIT_FAILURE);
 }
 
 
+#define VA_ARG_PRINTF 			\
+	va_list args;			\
+	va_start(args, fmt);		\
+	fprintf(stderr, fmt, args);	\
+	fprintf(stderr, "\n");		\
+	va_end(args);			\
+
 void
-fail(const char * fmt, ...)
+fail(const char *fmt, ...)
 {
+	VA_ARG_PRINTF 
+	exit(EXIT_FAILURE);
+}
+
+
+void
+debug_print(const char *fmt, ...)
+{
+	if(!dflag) return;
+
 	va_list args;
 	va_start(args, fmt);
 	fprintf(stderr, fmt, args);
-	fprintf(stderr, "\n");
+	fprintf(stderr, "\n"); 
 	va_end(args);
-	exit(EXIT_FAILURE);
 }
 
 
@@ -66,6 +84,7 @@ main(int argc, char **argv)
 	int aflag;	/* Algorithm selection switch -a used. */
 	char *aarg;	/* Name of the selected algorithm. */
 
+	int nfargs;     /* Number of non file arguments */
 
 	/* Pointers to the selected search and insert functions. These 
 	 * will be set when the command line arguments are parsed later. */
@@ -87,27 +106,40 @@ main(int argc, char **argv)
 	struct match *match;
 
 	aflag = 0;
+	dflag = 0;
+	nfargs = 1; /* program itself is the first arg in argv[] */
 	progname = basename(argv[0]);
 
 
 	/* Command line argument parsing. */
 
-	while( ( c = getopt(argc, argv, "a:") ) != -1 )
+	while( ( c = getopt(argc, argv, "a:d") ) != -1 )
 	{
 		switch(c) {
 		case 'a':
 			aflag++;
 			if(aflag > 1) usage();
 			aarg = optarg;
+			nfargs += 2; /* "-a" + "<alg name>" == 2 args */
+			debug_print("got opt a");
+			break;
+		case 'd':
+			dflag++;
+			if(dflag >1) usage();
+			nfargs++;
+			debug_print("got opt d");
 			break;
 		default:
 			usage();
 		}
+
 	}
+
+	debug_print("nfargs %i", nfargs);
 
 #define MATCH(word1, word2) (   (strcmp(word1,word2)==0)   )
 
-	if( argc < 4 ) usage();
+	if( argc < nfargs || argc < 3) usage();
 
 	/* Check which data structure was selected, if any.  */
 
@@ -116,12 +148,14 @@ main(int argc, char **argv)
 		init_redblack();
 		search = &search_redblack;
 		insert = &insert_redblack;
+		debug_print("redblack selected");
 	
 	} else if ( MATCH( aarg, "trie" ) ) {
 
 		init_trie();
 		search = &search_trie;
 		insert = &insert_trie;
+		debug_print("trie selected");
 
 	}  else if ( MATCH( aarg, "hash" ) ) {
 
@@ -134,6 +168,7 @@ main(int argc, char **argv)
 		init_hash();
 		search = &search_hash;
 		insert = &insert_hash;
+		debug_print("hash selected");
 
 	} else {
 		printf("illegal algorithm selection\n");
@@ -143,14 +178,19 @@ main(int argc, char **argv)
 
 	/* Read the files into the selected data structure. */
 
-	for( i = 3 ; i < argc ; i++ )  /* 3rd argument is the first file arg */
+	for( i = nfargs ; i < argc ; i++ ) /* iterate all files */
 	{
+
+		debug_print("processing file %s", argv[i]);
+
 		file = fopen(argv[i], "r");
 
 		if(file == NULL){ fail("no such file: %s\n", argv[i]); }
 
 		while( ( word = getword(file, &line, &column) ) != NULL )
 		{
+			debug_print("got word %s from file %s", word, argv[i]);
+
 			match = malloc(sizeof(struct match));
 
 			if(match == NULL) { fail("malloc failed\n"); }
@@ -168,6 +208,7 @@ main(int argc, char **argv)
 
 	while( ( word = getword(stdin, &line, &column) ) != NULL )
 	{
+		debug_print("searching for word %s", word);
 		search(word);
 		free(word);
 	}
