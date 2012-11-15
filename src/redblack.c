@@ -7,17 +7,17 @@
 
 static RBnode *root;
 
-static RBnode *grandparent(RBnode *node)
+static RBnode *get_grandparent(RBnode *node)
 {
 	return( node != NULL && node->parent != NULL && \
 		node->parent->parent != NULL ? node->parent->parent : NULL );
 }
 
-static RBnode *uncle(RBnode *node)
+static RBnode *get_uncle(RBnode *node)
 {
 	RBnode *grandp;
 
-	grandp = grandparent(node);
+	grandp = get_grandparent(node);
 
 	if(grandp == NULL) return NULL;
 
@@ -26,6 +26,35 @@ static RBnode *uncle(RBnode *node)
 	return(grandp->left == node->parent ? grandp->right : grandp->left);
 }
 
+static void rotate( RBdir direction, RBnode *node )
+{
+
+	RBnode *replacer = ( direction == LEFT ? node->right : node->left );
+
+	if(node == root) {
+		root = replacer;
+		root->parent = NULL;
+	} else {
+		if (node->parent->left == node) node->parent->left = replacer;
+		else node->parent->right = replacer;
+		replacer->parent = node->parent;
+	}
+
+	node->parent = replacer;
+		
+	if (direction == LEFT)
+	{
+		node->right = replacer->left;
+		if(node->right != NULL) node->right->parent = node;
+		replacer->left = node;
+	}
+	else if (direction == RIGHT)
+	{
+		node->left = replacer->right;
+		if(node->right != NULL) node->left->parent = node;
+		replacer->right = node;
+	}	
+}
 
 void init_redblack(void) {
 	root = (RBnode*)NULL;
@@ -36,6 +65,9 @@ void insert_redblack(char *key, Match *match) {
 	int cmp;	/* key comparation result */
 	RBnode *new;	/* the new node to be created */
 	RBnode *cur;	/* used for iterating through nodes */
+	RBnode *uncle;
+	RBnode *parent;
+	RBnode *grandp;
 
 	/* create new node */
 	new = malloc(sizeof(RBnode));
@@ -56,9 +88,7 @@ void insert_redblack(char *key, Match *match) {
 		return;
 	} 
 
-	/* xxx lets approach this by first doing a normal bst insert and
-	   then try to figure out how to make the tree conform to the rb
-	   rules. */
+	/* normal bst insert */
 
 	for( cur = root ; cur != NULL ; )
 	{
@@ -89,6 +119,30 @@ void insert_redblack(char *key, Match *match) {
 			break;
 		}
 	}
+
+	/* balance if needed */
+
+	if(new->parent->color == BLACK) { 
+		new->color = RED;
+		return;
+	}
+
+	uncle = get_uncle(new);
+
+	if(uncle == NULL || uncle->color == BLACK)
+	{
+		grandp = get_grandparent(new);
+
+		/* xxx todo */
+
+		
+		return;
+	}
+
+	/* xxx todo */
+
+	return;
+	
 }
 
 void search_redblack(char *key)

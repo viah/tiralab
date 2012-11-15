@@ -1,6 +1,7 @@
 #include "wordindex.h"
 
 typedef enum { RED, BLACK } RBcolor;
+typedef enum { LEFT, RIGHT } RBdir;
 
 typedef struct RBnode {
 	char *key;
