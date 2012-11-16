@@ -13,17 +13,25 @@ static RBnode *get_grandparent(RBnode *node)
 		node->parent->parent != NULL ? node->parent->parent : NULL );
 }
 
+static RBnode *get_sibling(RBnode *node)
+{
+	/* xxx todo: readability, make non ugly */
+	if(node->parent == NULL ||
+	   node->parent->left==NULL ||
+	   node->parent->right==NULL )
+		return(NULL);
+
+	if(node->parent->left == node) return (node->parent->right);
+
+	return(node->parent->left);
+	
+}
+
 static RBnode *get_uncle(RBnode *node)
 {
-	RBnode *grandp;
+	if( node == NULL || node->parent == NULL) return NULL;
 
-	grandp = get_grandparent(node);
-
-	if(grandp == NULL) return NULL;
-
-	if(grandp->left == NULL || grandp->right == NULL) return NULL;
-
-	return(grandp->left == node->parent ? grandp->right : grandp->left);
+	return( get_sibling( node->parent ) );
 }
 
 static void rotate( RBdir direction, RBnode *node )
@@ -191,6 +199,15 @@ void insert_redblack(char *key, Match *match) {
 
 	for(node=new->parent; node!=NULL&&node->color!=BLACK; node=node->parent)
 	{
+		sibling = get_sibling(node);
+
+		if( sibling == NULL || sibling->color == BLACK )
+		{
+
+		} else {
+			/* sibling is RED */
+		}
+
 	}
 
 	return;
