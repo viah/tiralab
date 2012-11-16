@@ -34,8 +34,22 @@ hitsisulaan käsin. Lisäaine voidaan syöttää myös koneellisesti, jolloin
 puhutaan mekanisoidusta TIG-hitsauksesta.
 EOF
 
+# Test 1, make
 
-# Test 1
+make clean
+if [ -e "wordindex" ]
+	then echo "Test 1 failed (make clean)"
+fi
+
+
+make
+if [ -s "wordindex" ]
+	then echo "Test 1 passed"
+	else echo "Test 2 failed (make)"
+fi
+
+
+# Test 2
 # Description: xxx todo
 
 echo "tensorit ne" | ./wordindex -a hash $testfile1 > $outfile
@@ -45,8 +59,8 @@ echo "ne: $testfile1 4 64" >> $expected_output
 diff $outfile $expected_output > /dev/null
 
 if [ $? -eq 0 ]
-	then echo "test 1 passed"
-	else echo "test 1 failed"
+	then echo "Test 2 passed"
+	else echo "Test 2 failed"
 fi
 
 rm $testfile1 $testfile2 $outfile $expected_output

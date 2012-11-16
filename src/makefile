@@ -4,4 +4,4 @@ wordindex: hashtable.c hashtable.h redblack.c redblack.h trie.c trie.h wordindex
 	gcc $(CFLAGS) -o wordindex wordindex.c hashtable.c redblack.c trie.c getword.c
 
 clean:
-	rm wordindex
+	rm wordindex >/dev/null 2>&1 || true
